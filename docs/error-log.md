@@ -9,3 +9,10 @@
 進捗は `progress-log.md`。
 
 ---
+
+## 2026-11-09
+
+### 手元で charm を走らせたら、メモリが足りず Mac が落ちた
+- **症状**: 例の頭 ernie で `charm ernie_test org/ernie_T1.nii.gz org/ernie_T2.nii.gz` を手元の Mac（Apple M4・メモリ 16 GB）で走らせたら、画面が落ちて Mac が止まった。charm のログ（`data/m2m_ernie_test/charm_log.html`）は `Starting surface creation` → `Estimating cortical surfaces` で終わっていて、その先が無い。`/usr/bin/time -l` の結果も残っていない。
+- **原因と解決**: 皮質の表面を作る段（Topofit）でメモリを使い切った。charm は 8 スレッドで動いていた。SimNIBS の要件は「メモリ 8 GB・16 GB を強く推奨」で、手元はぎりぎり満たしていたが、他のアプリを開いたままでは足りなかった。解決は、charm を手元で回さず、クラウドで回すこと。公開データの ernie は GitHub Actions（ubuntu-latest・16 GB・8 GB のスワップを足す）で回し直している（#1）。
+- **なぜその方法を選んだか**: 手元で他のアプリを閉じて回し直す手もあるが、また落ちれば作業中のものを失い、論文版では頭を何体も作るので毎回 Mac を数時間止めることになる。無料で使えるクラウドの中では、v2 が公開リポジトリなので GitHub Actions が無料で無制限、ワークフローとして手順も残る。申請で入手するデータは公開のログに載せられないので、そちらは Kaggle（メモリ約 30 GB）か大学の計算機を候補にした。AWS は無料プランだと起動できるサーバーが 8 GB までで足りず、有料プランに上げるとクレジットの後にカードに請求されるので外した。
