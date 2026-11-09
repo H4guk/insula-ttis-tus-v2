@@ -1,5 +1,7 @@
 # insula-ttis-tus-v2
 
+[日本語](README.ja.md)
+
 Paper version of the comparison between temporal interference stimulation (tTIS) and transcranial ultrasound stimulation (TUS) of the human insula.
 
 The competition version (Sim4Life Student Competition 2026, one head model in Sim4Life.lite, peripheral axons) is in [H4guk/insula-tTIS-TUS](https://github.com/H4guk/insula-tTIS-TUS). This repository redoes the comparison with open tools so that the limitations of that version can be fixed:
@@ -25,6 +27,3 @@ requirements.txt Python packages for post-processing
 
 Head data (MRI, CT), SimNIBS head meshes and field outputs are not committed (see `.gitignore`).
 
----
-
-島皮質に対する tTIS と TUS の比較の論文版。コンテスト版（S4L 2026）は H4guk/insula-tTIS-TUS に残し、こちらで限界（頭部モデル1体・手法ごとに違う神経ソルバー・末梢の軸索）を直す。
