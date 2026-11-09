@@ -59,8 +59,9 @@ jobs:
 
       - name: Run charm
         working-directory: work
-        # ジョブの上限（360 分）より先に止め、Summary と Upload が動く時間を残す
-        timeout-minutes: 330
+        # ジョブの上限（360 分）より先に止め、Summary と Upload が動く時間を残す。
+        # この段の上限は段が始まってから数えるので、前の準備（1 回目は 3 分）の分も含めて 60 分空ける
+        timeout-minutes: 300
         run: |
           set +e
           ( while true; do echo "$(date +%T) $(free -m | awk 'NR==2{print "mem_used_MB="$3} NR==3{print "swap_used_MB="$3}' | xargs)"; sleep 60; done ) > mem.log &
@@ -81,7 +82,8 @@ jobs:
           awk '{split($2,m,"="); split($3,s,"="); if (m[2]>mm) mm=m[2]; if (s[2]>ms) ms=s[2]} END {print "mem_used_MB max=" mm, "swap_used_MB max=" ms}' mem.log || true
           echo "--- last charm log lines"; tail -20 charm.log || true
           echo "--- OOM killer"
-          if sudo dmesg > dmesg.log 2>&1; then grep -i -E 'killed process|out of memory' dmesg.log || echo none; else echo "dmesg failed: OOM unknown"; fi
+          # カーネルのログの全文は成果物に入れないよう、work/ の外に置く
+          if sudo dmesg > "$RUNNER_TEMP/dmesg.log" 2>&1; then grep -i -E 'killed process|out of memory' "$RUNNER_TEMP/dmesg.log" || echo none; else echo "dmesg failed: OOM unknown"; fi
           ls m2m_ernie || true
 
       - name: Upload results
