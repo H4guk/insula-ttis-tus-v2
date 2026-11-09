@@ -1,0 +1,56 @@
+name: "[Bug] 不具合"
+description: 期待と異なる動作の報告。再現手順と証跡が必須です。
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        タイトルは「[Bug] 何が/どうなる」で 40 字以内。推測や原因はタイトルに書かない。
+  - type: dropdown
+    id: env
+    attributes:
+      label: 発生環境
+      options:
+        - 本番
+        - ステージング
+        - 開発
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      description: 番号付きで。第三者がこの手順だけで再現できること。5 手順を超えるなら Issue を分ける。
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: 期待する動作 / 実際の動作
+      description: 各 1〜2 行。ログ・スクリーンショット・エラー文はここに貼る（「エラーが出る」だけは不可）。
+      placeholder: |
+        期待:
+        実際:
+        証跡:
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 完了条件
+      description: チェックボックス形式。PR はこの内容を転記して ✓ を付ける。「修正する」ではなく確認可能な状態で書く。
+      placeholder: |
+        - [ ] 手順 3 で〇〇が表示される
+        - [ ] 回帰テスト △△ を追加し CI で通過
+    validations:
+      required: true
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: 対象外（任意）
+      description: この Issue で扱わないこと。後続 Issue を切る場合は番号を書く。

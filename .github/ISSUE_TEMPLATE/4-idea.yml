@@ -1,0 +1,28 @@
+name: "[アイデア] 提案・検討事項"
+description: 実装前提ではない提案。着手する場合は [改修] Issue を別途起票する。
+title: "[アイデア] "
+labels: ["idea"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        この Issue に直接 PR を紐付けない。採用が決まったら [改修] を起票し、この Issue を閉じる。
+  - type: textarea
+    id: background
+    attributes:
+      label: 背景 / 困りごと
+      description: 300 字以内。
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 提案
+      description: 300 字以内。代替案があれば併記。
+    validations:
+      required: true
+  - type: textarea
+    id: effect
+    attributes:
+      label: 期待効果 / 懸念
+      description: 各 1〜3 行。

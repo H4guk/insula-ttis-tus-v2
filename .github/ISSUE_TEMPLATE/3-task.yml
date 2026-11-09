@@ -1,0 +1,30 @@
+name: "[作業] コード変更を伴わない作業"
+description: 設定変更・調査・ドキュメント・運用作業など。
+title: "[作業] "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        タイトルは「[作業] 何をする」で 40 字以内。コード変更を伴う場合は [改修] を使う。
+  - type: textarea
+    id: content
+    attributes:
+      label: 作業内容
+      description: 箇条書き 5 点以内。手順が必要なら番号付き。
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 完了条件
+      description: チェックボックス形式。成果物がある場合はその場所（URL・パス）を含める。
+      placeholder: |
+        - [ ]
+    validations:
+      required: true
+  - type: input
+    id: due
+    attributes:
+      label: 期限（任意）
+      placeholder: "YYYY-MM-DD"

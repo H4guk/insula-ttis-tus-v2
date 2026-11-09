@@ -1,0 +1,46 @@
+name: "[改修] 既存機能の変更・改善"
+description: 既存機能の仕様変更・改善・リファクタ。完了条件が必須です。
+title: "[改修] "
+labels: ["improvement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        タイトルは「[改修] 対象 + 変更内容」で 40 字以内。
+  - type: textarea
+    id: background
+    attributes:
+      label: 背景 / 現状の課題
+      description: 300 字以内。なぜ変えるのかだけを書く。どう変えるかは次の欄。
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: 変更内容
+      description: 箇条書き 3 点以内。超えるなら Issue を分割する。
+      placeholder: |
+        -
+        -
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 完了条件
+      description: チェックボックス形式。PR はこの内容を転記して ✓ を付ける。確認可能な状態で書く。
+      placeholder: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: 対象外（任意）
+      description: この Issue で扱わないこと。
+  - type: input
+    id: related
+    attributes:
+      label: 関連 Issue / PR（任意）
+      placeholder: "#123, #456"

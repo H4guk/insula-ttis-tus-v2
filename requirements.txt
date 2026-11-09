@@ -1,0 +1,9 @@
+# 後処理・可視化で使う。
+numpy>=1.26
+matplotlib>=3.9
+
+# 予定のツール（未確認。段階 0 で Mac で動くかを確かめてから確定する）
+# - SimNIBS（頭部モデル charm・tTIS の場）: 公式インストーラで入れる（pip では入らない）
+# - BabelBrain（TUS の場）: 単体アプリ。代わりは k-Wave
+# - NEURON（神経）: pip install neuron
+# - PySONIC（TUS の膜内キャビテーション）: GitHub から入れる

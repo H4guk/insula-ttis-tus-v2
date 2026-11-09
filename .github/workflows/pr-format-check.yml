@@ -1,0 +1,147 @@
+name: PR format check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          # 任意: fine-grained PAT (Pull requests: Read and write) を secrets.PR_DRAFT_TOKEN に入れると Draft へ自動で戻す
+          PR_DRAFT_TOKEN: ${{ secrets.PR_DRAFT_TOKEN }}
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = (pr.body || '').replace(/\r\n/g, '\n');
+            const MARK = '<!-- pr-format-check -->';
+            const errors = [];
+
+            // ---- 見出しの有無と順序 -----------------------------------------
+            const REQUIRED = ['対応 Issue', '変更概要', '完了条件の充足', '検証証跡', 'レビュー観点'];
+            const headings = [...body.matchAll(/^## +(.+?)\s*$/gm)].map(m => m[1].trim());
+            const missing = REQUIRED.filter(h => !headings.includes(h));
+            if (missing.length) {
+              errors.push(`見出しが欠けています: ${missing.map(h => `「## ${h}」`).join('、')}`);
+            } else {
+              const idx = REQUIRED.map(h => headings.indexOf(h));
+              if (idx.some((v, i) => i > 0 && v < idx[i - 1])) {
+                errors.push('見出しの順番がテンプレートと違います');
+              }
+            }
+
+            // ---- セクション本文の切り出し -------------------------------------
+            const sections = {};
+            let cur = null;
+            for (const line of body.split('\n')) {
+              const m = line.match(/^## +(.+?)\s*$/);
+              if (m) { cur = m[1].trim(); sections[cur] = []; continue; }
+              if (cur) sections[cur].push(line);
+            }
+            const clean = name => (sections[name] || []).join('\n')
+              .replace(/<!--[\s\S]*?-->/g, '')          // HTML コメント
+              .replace(/^### .*$/gm, '')                 // 小見出し
+              .replace(/^```.*$/gm, '')                  // コードフェンス
+              .replace(/^\$\s*$/gm, '')                  // テンプレの "$" だけの行
+              .replace(/^[-*]\s*$/gm, '')                // 空の箇条書き
+              .replace(/^\s*\(.*\)\s*$/gm, '')           // (記入例) の行
+              .trim();
+
+            // ---- 対応 Issue ------------------------------------------------
+            if (sections['対応 Issue'] && !/#\d+/.test(clean('対応 Issue'))) {
+              errors.push('「対応 Issue」に Issue 番号がありません（例: Closes #123）');
+            }
+
+            // ---- 変更概要 --------------------------------------------------
+            if (sections['変更概要']) {
+              const bullets = clean('変更概要').split('\n').filter(l => /^[-*]\s*\S/.test(l));
+              if (bullets.length === 0) errors.push('「変更概要」が空です');
+              if (bullets.length > 3) errors.push(`「変更概要」が ${bullets.length} 点あります（3 点以内。超えるなら PR を分割）`);
+            }
+
+            // ---- 完了条件の充足 --------------------------------------------
+            if (sections['完了条件の充足']) {
+              const raw = sections['完了条件の充足'].join('\n').replace(/<!--[\s\S]*?-->/g, '');
+              const checked = (raw.match(/^\s*[-*] \[[xX]\] *\S/gm) || []).length;
+              const unchecked = (raw.match(/^\s*[-*] \[ \] *\S/gm) || []).length;
+              if (checked + unchecked === 0) errors.push('「完了条件の充足」にチェックボックスがありません（Issue の完了条件を転記してください）');
+              else if (unchecked > 0) errors.push(`「完了条件の充足」に未チェックが ${unchecked} 件あります（満たすまで Draft のまま）`);
+            }
+
+            // ---- 検証証跡 --------------------------------------------------
+            if (sections['検証証跡']) {
+              const c = clean('検証証跡');
+              const hasUrl = /https?:\/\/\S+/.test(c);
+              const hasCmd = /^\$\s*\S/m.test(sections['検証証跡'].join('\n'));
+              const hasOutput = c.split('\n').filter(l => l.trim()).length >= 2;
+              if (!hasUrl && !(hasCmd && hasOutput)) {
+                errors.push('「検証証跡」が空、または文章のみです（CI の URL、または実行コマンドと結果を貼ってください）');
+              }
+            }
+
+            // ---- レビュー観点 ----------------------------------------------
+            if (sections['レビュー観点']) {
+              const bullets = clean('レビュー観点').split('\n').filter(l => /^[-*]\s*\S/.test(l));
+              if (bullets.length === 0) errors.push('「レビュー観点」が空です');
+              if (bullets.length > 3) errors.push(`「レビュー観点」が ${bullets.length} 点あります（3 点以内）`);
+            }
+
+            // ---- PR タイトル -----------------------------------------------
+            if (!/^(feat|fix|refactor|docs|test|chore)(\([\w\-\/]+\))?: .+ \(#\d+\)$/.test(pr.title)) {
+              errors.push('PR タイトルが「type(scope): 要約 (#Issue番号)」の形式ではありません');
+            }
+
+            // ---- Draft へ戻す（GITHUB_TOKEN では不可。PAT がある場合のみ） ----------
+            let drafted = false;
+            const pat = process.env.PR_DRAFT_TOKEN;
+            if (errors.length && !pr.draft && pat) {
+              try {
+                const res = await fetch('https://api.github.com/graphql', {
+                  method: 'POST',
+                  headers: { authorization: `Bearer ${pat}`, 'content-type': 'application/json' },
+                  body: JSON.stringify({
+                    query: 'mutation($id: ID!) { convertPullRequestToDraft(input: {pullRequestId: $id}) { pullRequest { isDraft } } }',
+                    variables: { id: pr.node_id },
+                  }),
+                });
+                const json = await res.json();
+                drafted = !!(json.data && json.data.convertPullRequestToDraft && json.data.convertPullRequestToDraft.pullRequest.isDraft);
+                if (!drafted) core.warning(`Draft 変換に失敗: ${JSON.stringify(json.errors || json)}`);
+              } catch (e) {
+                core.warning(`Draft 変換に失敗: ${e.message}`);
+              }
+            }
+
+            // ---- コメントの作成・更新 -----------------------------------------
+            const { data: comments } = await github.rest.issues.listComments({
+              ...context.repo, issue_number: pr.number, per_page: 100,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(MARK));
+            let lead;
+            if (!errors.length) lead = '形式チェック OK。';
+            else if (drafted) lead = '**PR の形式に不備があるため Draft に戻しました。** 直して「Ready for review」にしてください。';
+            else if (pr.draft) lead = '**PR の形式に不備があります。** 直るまで Draft のままにしてください。';
+            else lead = '**PR の形式に不備があるためマージをブロックしています。** 直るまで Draft に戻してください（右上「Convert to draft」）。';
+            const commentBody = errors.length
+              ? `${MARK}\n${lead}\n\n${errors.map(e => `- ${e}`).join('\n')}\n\n書き方は CONTRIBUTING.md を参照。`
+              : `${MARK}\n${lead}`;
+            if (existing) {
+              if (existing.body !== commentBody) {
+                await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body: commentBody });
+              }
+            } else if (errors.length) {
+              await github.rest.issues.createComment({ ...context.repo, issue_number: pr.number, body: commentBody });
+            }
+
+            // ---- 結果 ---------------------------------------------------------
+            if (errors.length) {
+              core.setFailed(`形式チェック NG: ${errors.length} 件\n- ${errors.join('\n- ')}`);
+            } else {
+              core.info('形式チェック OK');
+            }

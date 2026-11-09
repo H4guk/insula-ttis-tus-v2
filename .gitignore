@@ -1,0 +1,41 @@
+# 頭部データ（MRI・CT は配布条件がデータセットごとに違う。README の入手方法を参照）
+data/
+*.nii
+*.nii.gz
+*.dcm
+
+# SimNIBS の頭部モデル・場の出力（大きい）
+m2m_*/
+*.msh
+*.msh.opt
+
+# BabelBrain / k-Wave の出力（大きい）
+*.h5
+*.hdf5
+
+# シミュレーション出力（場・電位など大きい配列）
+results/fields/
+*.npy
+*.npz
+*.mat
+
+# NEURON（nrnivmodl のビルド成果物）
+x86_64/
+arm64/
+*.o
+
+# 秘密情報
+.env
+.env.*
+*.key
+secrets/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# OS
+.DS_Store
