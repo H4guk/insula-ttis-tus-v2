@@ -14,15 +14,29 @@ Planned tools (not yet verified): SimNIBS (head models, tTIS fields), BabelBrain
 
 The neuron comparison in the paper uses cortical pyramidal neurons only. MorphoSONIC axons are kept as a check that the new pipeline reproduces the competition results, and as a fallback if the pyramidal neurons do not work for TUS; they are not reported as results.
 
-### Contents
+## Repository structure
 
 ```
-.github/         git rules (CONTRIBUTING.md), issue/PR templates, PR format check
-docs/            progress log, error log, method notes, figures
-notebooks/       analysis notebooks
-results/         small result tables (large field outputs are not committed)
-scripts/         pipeline and analysis scripts (see scripts/README.md)
-requirements.txt Python packages for post-processing
+insula-ttis-tus-v2/
+├── README.md            # this file (English)
+├── README.ja.md         # Japanese version of this file
+├── LICENSE              # MIT
+├── requirements.txt     # Python packages for post-processing (planned tools listed as comments)
+├── .gitignore           # excludes head data (MRI/CT) / SimNIBS meshes / field outputs / secrets
+├── .github/             # git rules
+│   ├── CONTRIBUTING.md              # rules for issues, branches, commits, PRs and reviews
+│   ├── ISSUE_TEMPLATE/              # issue forms: [Bug] / [改修] / [作業] / [アイデア]
+│   ├── PULL_REQUEST_TEMPLATE.md     # PR template
+│   └── workflows/pr-format-check.yml  # checks the PR title and headings
+├── scripts/             # pipeline and analysis scripts
+│   ├── README.md                    # which script belongs to which stage
+│   └── archive/                     # one-off probes and checks (kept as history)
+├── notebooks/           # analysis notebooks
+├── docs/                # progress log, error log, method notes
+│   ├── progress-log.md
+│   ├── error-log.md
+│   └── figures/
+└── results/             # small result tables (large field outputs are in .gitignore)
 ```
 
 Head data (MRI, CT), SimNIBS head meshes and field outputs are not committed (see `.gitignore`).

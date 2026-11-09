@@ -14,15 +14,29 @@
 
 論文の神経の比較は、皮質の錐体細胞だけで行います。MorphoSONIC の軸索は、新しいパイプラインがコンテスト版の結果を再現するかの照合と、TUS で錐体細胞がうまくいかないときの予備に使い、結果としては出しません。
 
-### 構成
+## リポジトリ構成
 
 ```
-.github/         git のルール（CONTRIBUTING.md）・Issue/PR のテンプレート・PR の形式チェック
-docs/            進捗ログ・エラーログ・方法のノート・図
-notebooks/       解析の notebook
-results/         小さな結果の表（大きな場の出力はコミットしない）
-scripts/         パイプラインと解析のスクリプト（scripts/README.md を参照）
-requirements.txt 後処理で使う Python パッケージ
+insula-ttis-tus-v2/
+├── README.md            # 英語版の README
+├── README.ja.md         # 本ファイル（日本語版）
+├── LICENSE              # MIT
+├── requirements.txt     # 後処理用の Python パッケージ（予定のツールはコメントで記載）
+├── .gitignore           # 頭部データ（MRI・CT）/ SimNIBS のメッシュ / 場の出力 / 秘密情報 を除外
+├── .github/             # git のルール
+│   ├── CONTRIBUTING.md              # Issue・branch・commit・PR・レビューの書き方
+│   ├── ISSUE_TEMPLATE/              # Issue のテンプレート [Bug] / [改修] / [作業] / [アイデア]
+│   ├── PULL_REQUEST_TEMPLATE.md     # PR のテンプレート
+│   └── workflows/pr-format-check.yml  # PR のタイトルと見出しを確かめる
+├── scripts/             # パイプラインと解析のスクリプト
+│   ├── README.md                    # どのスクリプトがどの段階のものか
+│   └── archive/                     # 一度きりの調査・検証（履歴として保存）
+├── notebooks/           # 解析ノートブック
+├── docs/                # 進捗ログ・エラーログ・方法のノート
+│   ├── progress-log.md
+│   ├── error-log.md
+│   └── figures/
+└── results/             # 小さな結果の表（大きい場の出力は .gitignore）
 ```
 
 頭部データ（MRI・CT）、SimNIBS の頭部メッシュ、場の出力はコミットしません（`.gitignore` を参照）。
