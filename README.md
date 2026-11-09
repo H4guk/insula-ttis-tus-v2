@@ -41,3 +41,7 @@ insula-ttis-tus-v2/
 
 Head data (MRI, CT), SimNIBS head meshes and field outputs are not committed (see `.gitignore`).
 
+
+## License
+
+The original content published in this repository is licensed under the [MIT License](LICENSE). Third-party tools and head data used with this repository are not included and follow their own licenses.
