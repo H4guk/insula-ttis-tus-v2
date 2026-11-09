@@ -10,6 +10,8 @@ The competition version (Sim4Life Student Competition 2026, one head model in Si
 
 Planned tools (not yet verified): SimNIBS (head models, tTIS fields), BabelBrain or k-Wave (TUS fields), NEURON with the Aberra cortical neurons and PySONIC (neuron responses).
 
+The neuron comparison in the paper uses cortical pyramidal neurons only. MorphoSONIC axons are kept as a check that the new pipeline reproduces the competition results, and as a fallback if the pyramidal neurons do not work for TUS; they are not reported as results.
+
 ### Contents
 
 ```

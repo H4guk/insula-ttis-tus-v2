@@ -7,3 +7,4 @@ matplotlib>=3.9
 # - BabelBrain（TUS の場）: 単体アプリ。代わりは k-Wave
 # - NEURON（神経）: pip install neuron
 # - PySONIC（TUS の膜内キャビテーション）: GitHub から入れる
+# - MorphoSONIC（軸索。コンテスト版の再現の照合と予備）: GitHub から入れる
