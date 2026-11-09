@@ -25,6 +25,8 @@ jobs:
       - name: Free disk space and add swap
         shell: bash
         run: |
+          # 後の Summary と Upload が work/ を前提にするので、最初に作っておく
+          mkdir -p work
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
           SW=/mnt/swap8; [ -d /mnt ] || SW=/swap8
           sudo fallocate -l 8G "$SW" && sudo chmod 600 "$SW" && sudo mkswap "$SW" && sudo swapon "$SW"
@@ -32,7 +34,7 @@ jobs:
 
       - name: Download the SimNIBS environment file
         shell: bash
-        run: curl -sSL -o environment_linux.yml "https://github.com/simnibs/simnibs/releases/download/v${SIMNIBS_VERSION}/environment_linux.yml"
+        run: curl -fsSL -o environment_linux.yml "https://github.com/simnibs/simnibs/releases/download/v${SIMNIBS_VERSION}/environment_linux.yml"
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
@@ -50,13 +52,15 @@ jobs:
         shell: bash
         run: |
           mkdir -p work && cd work
-          curl -sSL -o examples.zip https://github.com/simnibs/example-dataset/releases/latest/download/simnibs4_examples.zip
+          curl -fsSL -o examples.zip https://github.com/simnibs/example-dataset/releases/latest/download/simnibs4_examples.zip
           unzip -q examples.zip 'org/ernie_T1.nii.gz' 'org/ernie_T2.nii.gz'
           rm examples.zip
           ls -l org; df -h /
 
       - name: Run charm
         working-directory: work
+        # ジョブの上限（360 分）より先に止め、Summary と Upload が動く時間を残す
+        timeout-minutes: 330
         run: |
           set +e
           ( while true; do echo "$(date +%T) $(free -m | awk 'NR==2{print "mem_used_MB="$3} NR==3{print "swap_used_MB="$3}' | xargs)"; sleep 60; done ) > mem.log &
@@ -73,9 +77,11 @@ jobs:
         shell: bash
         run: |
           echo "--- time"; grep -E 'Elapsed|Maximum resident|Exit status' time.log || true
-          echo "--- memory peak (sampled every 60 s)"; sort -t= -k2 -n mem.log | tail -1 || true
+          echo "--- memory peak (whole machine, sampled every 60 s)"
+          awk '{split($2,m,"="); split($3,s,"="); if (m[2]>mm) mm=m[2]; if (s[2]>ms) ms=s[2]} END {print "mem_used_MB max=" mm, "swap_used_MB max=" ms}' mem.log || true
           echo "--- last charm log lines"; tail -20 charm.log || true
-          echo "--- OOM killer"; sudo dmesg | grep -i -E 'killed process|out of memory' || echo none
+          echo "--- OOM killer"
+          if sudo dmesg > dmesg.log 2>&1; then grep -i -E 'killed process|out of memory' dmesg.log || echo none; else echo "dmesg failed: OOM unknown"; fi
           ls m2m_ernie || true
 
       - name: Upload results
