@@ -1,0 +1,96 @@
+# SimNIBS の例の頭 ernie で charm を走らせ、時間とメモリの最大値を測る（段階0の 2(c)・#1）
+# ernie は公開データなので、ログと成果物が公開されても問題ない。申請で入手するデータはここで使わない。
+name: charm ernie test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['chore/*-charm-ernie-ci']
+    paths: ['.github/workflows/charm-ernie.yml']
+
+permissions:
+  contents: read
+
+env:
+  SIMNIBS_VERSION: '4.6.0'
+
+jobs:
+  charm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Free disk space and add swap
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          SW=/mnt/swap8; [ -d /mnt ] || SW=/swap8
+          sudo fallocate -l 8G "$SW" && sudo chmod 600 "$SW" && sudo mkswap "$SW" && sudo swapon "$SW"
+          nproc; free -h; df -h / /mnt || true
+
+      - name: Download the SimNIBS environment file
+        shell: bash
+        run: curl -sSL -o environment_linux.yml "https://github.com/simnibs/simnibs/releases/download/v${SIMNIBS_VERSION}/environment_linux.yml"
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          environment-file: environment_linux.yml
+          activate-environment: simnibs_env
+
+      - name: Install SimNIBS
+        run: |
+          pip install "https://github.com/simnibs/simnibs/releases/download/v${SIMNIBS_VERSION}/simnibs-${SIMNIBS_VERSION}-cp311-cp311-linux_x86_64.whl"
+          python -c "import simnibs; print(simnibs.__version__)"
+          df -h /
+
+      - name: Download the ernie T1 and T2
+        shell: bash
+        run: |
+          mkdir -p work && cd work
+          curl -sSL -o examples.zip https://github.com/simnibs/example-dataset/releases/latest/download/simnibs4_examples.zip
+          unzip -q examples.zip 'org/ernie_T1.nii.gz' 'org/ernie_T2.nii.gz'
+          rm examples.zip
+          ls -l org; df -h /
+
+      - name: Run charm
+        working-directory: work
+        run: |
+          set +e
+          ( while true; do echo "$(date +%T) $(free -m | awk 'NR==2{print "mem_used_MB="$3} NR==3{print "swap_used_MB="$3}' | xargs)"; sleep 60; done ) > mem.log &
+          sampler=$!
+          /usr/bin/time -v charm ernie org/ernie_T1.nii.gz org/ernie_T2.nii.gz > charm.log 2> time.log
+          status=$?
+          kill "$sampler"
+          grep -E 'Elapsed|Maximum resident' time.log || true
+          exit $status
+
+      - name: Summary
+        if: always()
+        working-directory: work
+        shell: bash
+        run: |
+          echo "--- time"; grep -E 'Elapsed|Maximum resident|Exit status' time.log || true
+          echo "--- memory peak (sampled every 60 s)"; sort -t= -k2 -n mem.log | tail -1 || true
+          echo "--- last charm log lines"; tail -20 charm.log || true
+          echo "--- OOM killer"; sudo dmesg | grep -i -E 'killed process|out of memory' || echo none
+          ls m2m_ernie || true
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: charm-ernie
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            work/charm.log
+            work/time.log
+            work/mem.log
+            work/m2m_ernie/ernie.msh
+            work/m2m_ernie/charm_log.html
+            work/m2m_ernie/charm_report.html
+            work/m2m_ernie/final_tissues.nii.gz
+            work/m2m_ernie/final_tissues_LUT.txt
