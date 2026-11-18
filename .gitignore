@@ -1,5 +1,7 @@
 # 頭部データ（MRI・CT は配布条件がデータセットごとに違う。README の入手方法を参照）
-data/
+# data/ の中身は入れない（README.md だけ入れる）
+data/*
+!data/README.md
 *.nii
 *.nii.gz
 *.dcm
@@ -23,6 +25,17 @@ results/fields/
 x86_64/
 arm64/
 *.o
+
+# LaTeX の中間ファイル（reports/ の原稿）
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
 
 # 秘密情報
 .env

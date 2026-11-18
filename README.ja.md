@@ -18,28 +18,34 @@
 
 ```
 insula-ttis-tus-v2/
-├── README.md            # 英語版の README
-├── README.ja.md         # 本ファイル（日本語版）
-├── LICENSE              # MIT
-├── requirements.txt     # 後処理用の Python パッケージ（予定のツールはコメントで記載）
-├── .gitignore           # 頭部データ（MRI・CT）/ SimNIBS のメッシュ / 場の出力 / 秘密情報 を除外
-├── .github/             # git のルール
+├── .github/             # git のルールと GitHub Actions
 │   ├── CONTRIBUTING.md              # Issue・branch・commit・PR・レビューの書き方
 │   ├── ISSUE_TEMPLATE/              # Issue のテンプレート [Bug] / [改修] / [作業] / [アイデア]
 │   ├── PULL_REQUEST_TEMPLATE.md     # PR のテンプレート
-│   └── workflows/pr-format-check.yml  # PR のタイトルと見出しを確かめる
+│   └── workflows/                   # pr-format-check.yml（PR の形式）・charm-ernie.yml（例の頭で charm）
+├── data/                # 頭部データと例のデータ（中身は .gitignore）
+│   └── README.md                    # データの出所・入手の手順・使ってよい条件
+├── notebooks/           # 解析ノートブック
 ├── scripts/             # パイプラインと解析のスクリプト
 │   ├── README.md                    # どのスクリプトがどの段階のものか
 │   └── archive/                     # 一度きりの調査・検証（履歴として保存）
-├── notebooks/           # 解析ノートブック
-├── docs/                # 進捗ログ・エラーログ・方法のノート
+├── tests/               # scripts/ の関数の単体テスト
+├── figures/             # 生成した図（論文に貼る）
+├── results/             # 小さな結果の表（大きい場の出力は .gitignore）
+├── reports/             # 論文（原稿）
+│   └── latex/                       # LaTeX の共通設定（preamble など）
+├── references/          # 論文で引く文献（BibTeX）
+├── logs/                # 進捗ログ・エラーログ
 │   ├── progress-log.md
-│   ├── error-log.md
-│   └── figures/
-└── results/             # 小さな結果の表（大きい場の出力は .gitignore）
+│   └── error-log.md
+├── .gitignore           # 頭部データ / SimNIBS のメッシュ / 場の出力 / 秘密情報 を除外
+├── requirements.txt     # 依存ライブラリ一覧
+├── README.md            # 英語版の README
+├── README.ja.md         # 本ファイル（日本語版）
+└── LICENSE              # MIT
 ```
 
-頭部データ（MRI・CT）、SimNIBS の頭部メッシュ、場の出力はコミットしません（`.gitignore` を参照）。
+頭部データ（MRI・CT）、SimNIBS の頭部メッシュ、場の出力はコミットしません（`.gitignore` を参照）。各フォルダの README.md に、そこに置くものと名前の付け方を書いています。
 
 ## ライセンス
 

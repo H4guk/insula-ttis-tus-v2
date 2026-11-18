@@ -18,28 +18,34 @@ The neuron comparison in the paper uses cortical pyramidal neurons only. MorphoS
 
 ```
 insula-ttis-tus-v2/
-├── README.md            # this file (English)
-├── README.ja.md         # Japanese version of this file
-├── LICENSE              # MIT
-├── requirements.txt     # Python packages for post-processing (planned tools listed as comments)
-├── .gitignore           # excludes head data (MRI/CT) / SimNIBS meshes / field outputs / secrets
-├── .github/             # git rules
+├── .github/             # git rules and GitHub Actions
 │   ├── CONTRIBUTING.md              # rules for issues, branches, commits, PRs and reviews
 │   ├── ISSUE_TEMPLATE/              # issue forms: [Bug] / [改修] / [作業] / [アイデア]
 │   ├── PULL_REQUEST_TEMPLATE.md     # PR template
-│   └── workflows/pr-format-check.yml  # checks the PR title and headings
+│   └── workflows/                   # pr-format-check.yml (PR format), charm-ernie.yml (charm on the example head)
+├── data/                # head data and example data (contents are in .gitignore)
+│   └── README.md                    # where each dataset comes from, how to get it, terms of use
+├── notebooks/           # analysis notebooks
 ├── scripts/             # pipeline and analysis scripts
 │   ├── README.md                    # which script belongs to which stage
 │   └── archive/                     # one-off probes and checks (kept as history)
-├── notebooks/           # analysis notebooks
-├── docs/                # progress log, error log, method notes
+├── tests/               # unit tests for functions in scripts/
+├── figures/             # generated figures (for the paper)
+├── results/             # small result tables (large field outputs are in .gitignore)
+├── reports/             # the paper (manuscript)
+│   └── latex/                       # shared LaTeX settings (preamble etc.)
+├── references/          # references cited in the paper (BibTeX)
+├── logs/                # progress log and error log
 │   ├── progress-log.md
-│   ├── error-log.md
-│   └── figures/
-└── results/             # small result tables (large field outputs are in .gitignore)
+│   └── error-log.md
+├── .gitignore           # excludes head data / SimNIBS meshes / field outputs / secrets
+├── requirements.txt     # dependency list
+├── README.md            # this file (English)
+├── README.ja.md         # Japanese version of this file
+└── LICENSE              # MIT
 ```
 
-Head data (MRI, CT), SimNIBS head meshes and field outputs are not committed (see `.gitignore`).
+Head data (MRI, CT), SimNIBS head meshes and field outputs are not committed (see `.gitignore`). Each folder has a README.md that says what goes there and how files are named.
 
 
 ## License

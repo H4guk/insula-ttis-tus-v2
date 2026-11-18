@@ -1,10 +1,26 @@
-# 後処理・可視化で使う。
-numpy>=1.26
-matplotlib>=3.9
+# 依存ライブラリ一覧
+#
+# このファイルは神経の計算と後処理の環境（Python 3.11・段階0で確認した版）。
+#   python -m venv .venv && .venv/bin/pip install -r requirements.txt
+# SimNIBS は numpy の版がぶつかるので別の conda 環境に入れる（下のコメント）。
 
-# 予定のツール（未確認。段階 0 で Mac で動くかを確かめてから確定する）
-# - SimNIBS（頭部モデル charm・tTIS の場）: 公式インストーラで入れる（pip では入らない）
-# - BabelBrain（TUS の場）: 単体アプリ。代わりは k-Wave
-# - NEURON（神経）: pip install neuron
-# - PySONIC（TUS の膜内キャビテーション）: GitHub から入れる
-# - MorphoSONIC（軸索。コンテスト版の再現の照合と予備）: GitHub から入れる
+# 神経（NEURON・PySONIC・MorphoSONIC）
+neuron==9.0.2
+PySONIC @ git+https://github.com/tjjlemaire/PySONIC@10ed530eb1f106d9a51cb72aa14ed9a534dab232
+MorphoSONIC @ git+https://github.com/tjjlemaire/MorphoSONIC@5d0d264d7312021c46c7ff8aed7ceff3ee864d6a
+
+# 後処理・可視化
+numpy==1.26.4
+scipy==1.17.1
+matplotlib==3.8.4
+pandas==2.1.4
+
+# --- pip では入らないもの ---
+# PySONIC の表（*.pkl）は Git LFS で管理されているので、git-lfs を入れて clone し、
+#   使う表を `git lfs pull --include=...` で取る（pip の git インストールでは中身が入らない）。
+# Aberra の錐体細胞（ModelDB 241165・CC BY-NC-SA 4.0）: このリポジトリには入れない。
+#   git clone https://github.com/ModelDBRepository/241165（93e01d4a927ab0cc5ca137329b86925777e63f02）
+#   して mechanisms/ を nrnivmodl でコンパイルする。
+# SimNIBS 4.6.0（頭部モデル・tTIS の場）: 公式の environment_<os>.yml で conda 環境 simnibs_env を作り、
+#   https://github.com/simnibs/simnibs/releases/tag/v4.6.0 の wheel を pip で入れる（numpy 2.3 を使う）。
+# BabelBrain か k-Wave（TUS の場）: 未確認（段階0の 4）。
