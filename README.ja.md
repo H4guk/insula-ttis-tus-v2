@@ -25,7 +25,6 @@ insula-ttis-tus-v2/
 │   └── workflows/                   # pr-format-check.yml（PR の形式）・charm-ernie.yml（例の頭で charm）
 ├── data/                # 頭部データと例のデータ（中身は .gitignore）
 │   └── README.md                    # データの出所・入手の手順・使ってよい条件
-├── notebooks/           # 解析ノートブック
 ├── scripts/             # パイプラインと解析のスクリプト
 │   ├── README.md                    # どのスクリプトがどの段階のものか
 │   └── archive/                     # 一度きりの調査・検証（履歴として保存）

@@ -25,7 +25,6 @@ insula-ttis-tus-v2/
 │   └── workflows/                   # pr-format-check.yml (PR format), charm-ernie.yml (charm on the example head)
 ├── data/                # head data and example data (contents are in .gitignore)
 │   └── README.md                    # where each dataset comes from, how to get it, terms of use
-├── notebooks/           # analysis notebooks
 ├── scripts/             # pipeline and analysis scripts
 │   ├── README.md                    # which script belongs to which stage
 │   └── archive/                     # one-off probes and checks (kept as history)
